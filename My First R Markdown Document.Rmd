@@ -1,0 +1,45 @@
+My First R Markdown File
+========================
+
+This is my first R markdown file.
+
+Here we are going to load some data
+
+```{r currenttime}
+time<-
+```
+
+
+```{r}
+library(datasets)
+data("airquality")
+summary(airquality)
+```
+
+Let's first make a pairs plot of the data.
+I set echo=False to stop the code from echoing and appearing in the final document.
+
+if i wanted ot hide the results, i would set results="hide"
+```{r plot_pairs_airquality,echo=FALSE}
+pairs(airquality)
+```
+
+Here's a regression model of ozone on wind, solar radiation, and temperature
+
+```{r}
+library(stats)
+fit<- lm(Ozone ~ Wind + Solar.R + Temp, data= airquality)
+summary(fit)
+```
+
+Here's an unorderd list:
+
+* First element
+* Second Element
+
+- What's this
+- and that?
+
+1. one
+0. two
+3. three
