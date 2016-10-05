@@ -1,0 +1,75 @@
+---
+title: "Assignment 1"
+author: "Philip"
+date: "03 October 2016"
+output: html_document
+---
+
+
+## Extract and Loading the Data
+This section creates a table which further analysis will be perfromed, /activity/.
+First appropriate extracts the activity file contained in the GitHub repository downloaded on *Insert Date here*.
+
+``` {r libraries, echo=TRUE, results="hide"}
+library(lubridate)
+```
+
+
+``` {r download_repo_zip, echo=TRUE, results="hide"}
+## R code to download file from R D Peng's repo and unzips it
+unzip("activity.zip")
+
+```
+
+The data was downloaded and read in as a dataframe. The data field was converted to a date type for further grouping.
+```{r read_data, echo=TRUE, results="hide"}
+activity<-read.csv(file="activity.csv",stringsAsFactors = FALSE)
+activity$date<-ymd(activity$date)
+summary(activity)
+```
+
+
+## Exploring the Data
+For the following analysis missing values were ignored. It is additionally assumed
+that days with 0 steps is a result of missing data. NAs were removed to prevent
+operating on NAs should the sensors report NAs for any particular interval in a day.
+```{r initialExplore, echo=FALSE}
+AverageStepspDay <- tapply( 
+                            activity$steps
+                            ,activity$date
+                            ,function (x) sum(x, na.rm = TRUE)) ## Removed NAs
+```
+
+
+Mean and Median were determined ignoring days with 0 steps.
+```{r histogram1}
+StepHist<-hist(AverageStepspDay 
+                ,main="Distribution of total number of steps per day"
+                ,xlab="Total number of steps in a day")
+
+## Account for 0s induced by likely missing data
+AdjustedFrequency <- StepHist$counts[1]-
+                        length(x = AverageStepspDay[AverageStepspDay==0])
+                        ## Determine Frequency without 0s
+segments(StepHist$breaks[1],AdjustedFrequency,
+         StepHist$breaks[2],AdjustedFrequency)
+text(x = StepHist$mids[1],y = (AdjustedFrequency+StepHist$counts[1])/2,
+     labels="0 Steps")
+
+meanSteps <- mean(AverageStepspDay[AverageStepspDay!=0])
+medSteps <- median(AverageStepspDay[AverageStepspDay!=0])
+
+abline(v = c(meanSteps,medSteps),col=c("blue","red"),lty=c(1,2))
+text(x=meanSteps,y = mean(StepHist$counts)+1 #Quick Adjustment on text position
+     ,pos=2
+     ,labels = paste("Mean",round(meanSteps,digits = 0))
+     ,col = "blue")
+text(x=medSteps,y = mean(StepHist$counts)+1 #Quick Adjustment on text position
+     ,pos=4
+     ,labels = paste("Median",round(medSteps,digits = 0))
+     ,col = "red")
+
+```
+
+The histogram clearly details the 
+
