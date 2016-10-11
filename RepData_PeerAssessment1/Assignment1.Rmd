@@ -6,7 +6,8 @@ output: html_document
 ---
 
 
-## Extract and Loading the Data
+## Loading and preprocessing the data
+
 This section creates a table which further analysis will be perfromed, /activity/.
 First appropriate extracts the activity file contained in the GitHub repository downloaded on *Insert Date here*.
 
@@ -29,15 +30,23 @@ summary(activity)
 ```
 
 
-## Exploring the Data
+## What is the mean total number of steps taken per day?
 For the following analysis missing values were ignored. It is additionally assumed
 that days with 0 steps is a result of missing data. NAs were removed to prevent
-operating on NAs should the sensors report NAs for any particular interval in a day.
-```{r initialExplore, echo=FALSE}
-AverageStepspDay <- tapply( 
-                            activity$steps
+operating on NAs should the sensors report NAs for any particular interval in a day.  
+
+Compute mean of steps over all days by day and then time interval.
+```{r initialExplore, echo=TRUE}
+AverageStepspDay        <- tapply( 
+                             activity$steps
                             ,activity$date
-                            ,function (x) sum(x, na.rm = TRUE)) ## Removed NAs
+                            ,sum
+                            ,na.rm=TRUE)
+AverageStepspInterval   <- tapply( 
+                             activity$steps
+                            ,activity$interval
+                            ,mean
+                            ,na.rm=TRUE)
 ```
 
 
@@ -51,17 +60,23 @@ StepHist<-hist(AverageStepspDay
 AdjustedFrequency <- StepHist$counts[1]-
                         length(x = AverageStepspDay[AverageStepspDay==0])
                         ## Determine Frequency without 0s
+
 segments(StepHist$breaks[1],AdjustedFrequency,
          StepHist$breaks[2],AdjustedFrequency)
-text(x = StepHist$mids[1],y = (AdjustedFrequency+StepHist$counts[1])/2,
-     labels="0 Steps")
 
-meanSteps <- mean(AverageStepspDay[AverageStepspDay!=0])
-medSteps <- median(AverageStepspDay[AverageStepspDay!=0])
+text( x = StepHist$mids[1]
+     ,y = (AdjustedFrequency+StepHist$counts[1])/2
+     ,labels="0 Steps")
 
-abline(v = c(meanSteps,medSteps),col=c("blue","red"),lty=c(1,2))
-text(x=meanSteps,y = mean(StepHist$counts)+1 #Quick Adjustment on text position
-     ,pos=2
+meanSteps <- mean  (AverageStepspDay[AverageStepspDay!=0])
+medSteps  <- median(AverageStepspDay[AverageStepspDay!=0])
+
+abline( v = c(meanSteps,medSteps)
+       ,col = c("blue","red")
+       ,lty = c(1,2))
+text( x=meanSteps
+     ,y = mean(StepHist$counts)+1 #Quick Adjustment on text position
+     ,pos = 2
      ,labels = paste("Mean",round(meanSteps,digits = 0))
      ,col = "blue")
 text(x=medSteps,y = mean(StepHist$counts)+1 #Quick Adjustment on text position
@@ -71,5 +86,30 @@ text(x=medSteps,y = mean(StepHist$counts)+1 #Quick Adjustment on text position
 
 ```
 
-The histogram clearly details the 
+
+## What is the average daily activity pattern?
+Timeseries plot of of the 5-minute interval and the average number of steps taken, averaged across all days
+
+
+``` {R TimeSeries1}
+
+plot( x = names(AverageStepspInterval)
+     ,type = "l"
+     ,y = AverageStepspInterval
+     ,xlab = "Interval"
+     ,ylab = "Average Number of Steps"
+     ,main = "Time Series Plot of Average Number of Steps throughout a day"
+     ,
+     )
+MaxStepsInterval <- AverageStepspInterval[
+                    AverageStepspInterval==max(AverageStepspInterval)]
+abline( v = names(MaxStepsInterval)
+       ,col = "red" )
+text( x = names(MaxStepsInterval)
+     ,labels = names(MaxStepsInterval)
+     ,pos = 1
+     ,col = "black"
+)
+```
+
 
