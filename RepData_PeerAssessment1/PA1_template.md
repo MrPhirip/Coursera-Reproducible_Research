@@ -1,12 +1,4 @@
----
-output: 
-  html_document: 
-    keep_md: yes
----
-``` {R setwd, echo=FALSE}
-setwd("C:/R/Coursera/Reproducible Research/RepData_PeerAssessment1")
-#opts_chunk$set(message = FALSE)
-```
+
 
 ---
 title: "Assignment 1"
@@ -21,24 +13,36 @@ output: html_document
 This section loads all libraries used in the analysis; 
 Then downloads and reads the data for analysis. Additionally, 
 
-``` {r libraries, results='hide'}
+
+```r
 library(lubridate)
 ```
 
-``` {r download_repo_zip, echo=TRUE, results="hide"}
+```
+## 
+## Attaching package: 'lubridate'
+```
+
+```
+## The following object is masked from 'package:base':
+## 
+##     date
+```
+
+
+```r
 download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
               ,"activity.zip")
 unzip("activity.zip")
 ```
 
-```{r downloaddate, echo=FALSE,results="hide"} 
-downloaddate<-today() 
-```
 
-The appropriate extracts the activity file contained in the GitHub repository downloaded on `r downloaddate`.
+
+The appropriate extracts the activity file contained in the GitHub repository downloaded on 2016-10-24.
 
 The data was downloaded and read in as a dataframe. The data field was converted to a date type for further grouping.
-```{r read_data, echo=TRUE, results="hide"}
+
+```r
 activity<-read.csv(file="activity.csv",stringsAsFactors = FALSE)
 activity$date<-ymd(activity$date)
 summary(activity)
@@ -51,7 +55,8 @@ that days with 0 steps is a result of missing data. NAs were removed to prevent
 operating on NAs should the sensors report NAs for any particular interval in a day.  
 
 Compute mean of steps over all days by day and then time interval.
-```{r initialExplore, echo=TRUE}
+
+```r
 AverageStepspDay        <- tapply( 
                              activity$steps
                             ,activity$date
@@ -66,7 +71,8 @@ AverageStepspInterval   <- tapply(
 
 
 Mean and Median were determined ignoring days with 0 steps.
-```{r histogram1}
+
+```r
 StepHist<-hist(AverageStepspDay 
                 ,main="Distribution of total number of steps per day"
                 ,xlab="Total number of steps in a day")
@@ -98,16 +104,17 @@ text(x=medSteps,y = mean(StepHist$counts)+1 #Quick Adjustment on text position
      ,pos=4
      ,labels = paste("Median",round(medSteps,digits = 0))
      ,col = "red")
-
 ```
+
+![](PA1_template_files/figure-html/histogram1-1.png)<!-- -->
 
 
 ## What is the average daily activity pattern?
 Timeseries plot of of the 5-minute interval and the average number of steps taken, averaged across all days
 
 
-``` {R TimeSeries1}
 
+```r
 plot( x = names(AverageStepspInterval)
      ,type = "l"
      ,y = AverageStepspInterval
@@ -140,8 +147,9 @@ text( x = names(MaxStepsInterval)
      ,pos = 4
      ,col = "red"
 )
-
 ```
+
+![](PA1_template_files/figure-html/TimeSeries1-1.png)<!-- -->
 
 
 ## Inputing missing values
@@ -149,15 +157,19 @@ text( x = names(MaxStepsInterval)
 We can see from the following how many missing values we have in the data set.
 
 
-``` {R CountMissingvalues}
+
+```r
 sum(is.na(activity$steps))
+```
+
+```
+## [1] 2304
 ```
 
 My strategy for filling in missing values is to take the average number of steps at the time interval.
 
-``` {R ImputeMissingvalues}
 
-
+```r
 I1<-merge( x = activity[is.na(activity$steps),]
       ,y = cbind.data.frame(data.frame(AverageStepspInterval),as.numeric(names(AverageStepspInterval)))
       ,by.x = 'interval'
@@ -199,6 +211,8 @@ text(x=imedSteps,y = mean(iStepHist$counts)+1 #Quick Adjustment on text position
      ,col = "red")
 ```
 
+![](PA1_template_files/figure-html/ImputeMissingvalues-1.png)<!-- -->
+
 As we can see from the above, the distribution does not change significantly from
 when missing values were ignored; This includes the median and mean with a minor
 change in the median to 10766 from 10765.
@@ -206,7 +220,8 @@ change in the median to 10766 from 10765.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-``` {R PanelPlots}
+
+```r
 iactivity$Weekday <- wday(iactivity$date)
 iactivitywd<-iactivity[iactivity$Weekday>1 & iactivity$Weekday<7,]
 iactivitywe<-iactivity[iactivity$Weekday==1 | iactivity$Weekday==7,]
@@ -239,3 +254,5 @@ plot( x = names(weiAverageStepspInterval)
      ,main = "Average Steps of 5 Minute Intervals (Weekends)"
      )
 ```
+
+![](PA1_template_files/figure-html/PanelPlots-1.png)<!-- -->
