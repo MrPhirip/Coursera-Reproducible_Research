@@ -135,7 +135,7 @@ $(document).ready(function () {
 <pre class="r"><code>download.file(&quot;https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip&quot;
               ,&quot;activity.zip&quot;)
 unzip(&quot;activity.zip&quot;)</code></pre>
-<p>The appropriate extracts the activity file contained in the GitHub repository downloaded on 2016-10-11.</p>
+<p>The appropriate extracts the activity file contained in the GitHub repository downloaded on 2016-10-24.</p>
 <p>The data was downloaded and read in as a dataframe. The data field was converted to a date type for further grouping.</p>
 <pre class="r"><code>activity&lt;-read.csv(file=&quot;activity.csv&quot;,stringsAsFactors = FALSE)
 activity$date&lt;-ymd(activity$date)
